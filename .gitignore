@@ -1,12 +1,32 @@
-*.class
+# Ignore Play! working directory #
+bin/
+/db
+.eclipse
+.classpath
+.project
+.settings/
+/lib/
+/logs/
+/modules
+/project/project
+/project/target
+/target
+tmp/
+test-result
+server.pid
+*.iml
+*.eml
+/dist/
+.cache
+.gradle/
+build/
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+#src.zip
 
-# Package Files #
-*.jar
-*.war
-*.ear
+.idea
+.gradle
+# For MacOS:
+.DS_Store
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# For vim:
+*.swp

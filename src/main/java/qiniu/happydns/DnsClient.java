@@ -1,6 +1,7 @@
 package qiniu.happydns;
 
 import qiniu.happydns.http.DomainNotOwn;
+import qiniu.happydns.http.IHosts;
 import qiniu.happydns.local.Hosts;
 import qiniu.happydns.util.LruCache;
 
@@ -18,18 +19,27 @@ public final class DnsClient {
 
     private final IResolver[] resolvers;
     private final LruCache<String, Record[]> cache;
-    private final Hosts hosts = new Hosts();
-    private volatile int index = 0;
+    private final IHosts hosts;
     private final ShuffleIps sorter;
+    private volatile int index = 0;
 
 
     /**
      * @param resolvers 具体的dns 解析示例，可以是local或者httpdns
      */
     public DnsClient(IResolver[] resolvers) {
+        this(resolvers, new Hosts());
+    }
+
+    /**
+     * @param resolvers 具体的dns 解析示例，可以是local或者httpdns
+     * @param hosts     hosts 指定本地IP
+     */
+    public DnsClient(IResolver[] resolvers, IHosts hosts) {
         this.resolvers = resolvers.clone();
         cache = new LruCache<String, Record[]>(128);
         sorter = new ShuffleIps();
+        this.hosts = hosts;
     }
 
     private static Record[] trimCname(Record[] records) {
@@ -70,9 +80,9 @@ public final class DnsClient {
             if (x != -1 && Integer.parseInt(ip.substring(y, x)) > 255) return false;
 
             y = ip.indexOf('.', ++x);
-            return !(y != -1 && Integer.parseInt(ip.substring(x, y)) > 255 &&
-                    Integer.parseInt(ip.substring(++y, ip.length() - 1)) > 255 &&
-                    ip.charAt(ip.length() - 1) != '.');
+            return !(y != -1 && Integer.parseInt(ip.substring(x, y)) > 255
+                    && Integer.parseInt(ip.substring(++y, ip.length() - 1)) > 255
+                    && ip.charAt(ip.length() - 1) != '.');
 
         } catch (NumberFormatException e) {
             return false;
@@ -120,7 +130,7 @@ public final class DnsClient {
     private String[] queryInternal(Domain domain) throws IOException {
         Record[] records = null;
         if (domain.hostsFirst) {
-            String[] ret = hosts.query(domain);
+            String[] ret = hosts.query(domain.domain);
             if (ret != null && ret.length != 0) {
                 return ret;
             }
@@ -136,7 +146,7 @@ public final class DnsClient {
                 if (records != null && records.length != 0) {
                     if (!records[0].isExpired()) {
                         return records2Ip(records);
-                    }else{
+                    } else {
                         records = null;
                     }
                 }
@@ -173,7 +183,7 @@ public final class DnsClient {
 
         if (records == null || records.length == 0) {
             if (!domain.hostsFirst) {
-                String[] rs = hosts.query(domain);
+                String[] rs = hosts.query(domain.domain);
                 if (rs != null && rs.length != 0) {
                     return rs;
                 }
