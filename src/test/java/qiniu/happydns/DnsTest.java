@@ -3,13 +3,11 @@ package qiniu.happydns;
 import org.junit.Assert;
 import org.junit.Test;
 import qiniu.happydns.http.IHosts;
-import qiniu.happydns.local.AndroidDnsServer;
-import qiniu.happydns.local.HijackingDetectWrapper;
-import qiniu.happydns.local.Hosts;
-import qiniu.happydns.local.Resolver;
+import qiniu.happydns.local.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by bailong on 15/6/21.
@@ -20,8 +18,8 @@ public class DnsTest {
     @Test
     public void testDns() throws IOException {
         IResolver[] resolvers = new IResolver[2];
-        resolvers[0] = AndroidDnsServer.defaultResolver();
-        resolvers[1] = new Resolver(InetAddress.getByName("223.5.5.5"));
+        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
+        resolvers[1] = new Resolver(InetAddress.getByName("119.29.29.29"));
         DnsClient dns = new DnsClient(resolvers);
         String[] ips = dns.query("www.qiniu.com");
         Assert.assertNotNull(ips);
@@ -31,9 +29,9 @@ public class DnsTest {
     @Test
     public void testTtl() throws IOException {
         IResolver[] resolvers = new IResolver[2];
-        resolvers[0] = AndroidDnsServer.defaultResolver();
+        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
         resolvers[1] = new HijackingDetectWrapper(
-                new Resolver(InetAddress.getByName("223.5.5.5")));
+                new Resolver(InetAddress.getByName("119.29.29.29")));
 
         IHosts h = new Hosts();
         h.put("hello.qiniu.com", "1.1.1.1");
@@ -55,7 +53,7 @@ public class DnsTest {
 
     public void testCname() throws IOException {
         IResolver[] resolvers = new IResolver[2];
-        resolvers[0] = AndroidDnsServer.defaultResolver();
+        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
         resolvers[1] = new HijackingDetectWrapper(
                 new Resolver(InetAddress.getByName("114.114.115.115")));
 
@@ -77,9 +75,9 @@ public class DnsTest {
         Assert.assertTrue(!"3.3.3.3".equals(r[0]));
     }
 
-    public void testNull() {
+    public void testNull() throws UnknownHostException {
         IResolver[] resolvers = new IResolver[1];
-        resolvers[0] = AndroidDnsServer.defaultResolver();
+        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
         DnsClient dns = new DnsClient(resolvers);
         IOException e = null;
         try {
@@ -111,7 +109,7 @@ public class DnsTest {
 
     public void testIp() throws IOException {
         IResolver[] resolvers = new IResolver[1];
-        resolvers[0] = AndroidDnsServer.defaultResolver();
+        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
         DnsClient dns = new DnsClient(resolvers);
         String[] ips = dns.query("1.1.1.1");
         Assert.assertEquals(ips.length, 1);
