@@ -16,6 +16,9 @@ import java.util.List;
 
 // this is invalid on android
 public final class SystemDnsServer {
+    private SystemDnsServer() {
+    }
+
     // has 300s latency when system resolv change https://community.oracle.com/thread/1148912
     public static String[] getByJNDI() {
         try {
@@ -90,7 +93,5 @@ public final class SystemDnsServer {
             e.printStackTrace();
         }
         return null;
-    }
-    private SystemDnsServer() {
     }
 }

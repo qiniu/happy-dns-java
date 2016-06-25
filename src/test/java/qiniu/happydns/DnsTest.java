@@ -3,7 +3,10 @@ package qiniu.happydns;
 import org.junit.Assert;
 import org.junit.Test;
 import qiniu.happydns.http.IHosts;
-import qiniu.happydns.local.*;
+import qiniu.happydns.local.HijackingDetectWrapper;
+import qiniu.happydns.local.Hosts;
+import qiniu.happydns.local.Resolver;
+import qiniu.happydns.local.SystemDnsServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -29,7 +32,8 @@ public class DnsTest {
     @Test
     public void testTtl() throws IOException {
         IResolver[] resolvers = new IResolver[2];
-        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
+        resolvers[0] = new HijackingDetectWrapper(
+                new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0])));
         resolvers[1] = new HijackingDetectWrapper(
                 new Resolver(InetAddress.getByName("119.29.29.29")));
 
@@ -53,7 +57,8 @@ public class DnsTest {
 
     public void testCname() throws IOException {
         IResolver[] resolvers = new IResolver[2];
-        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
+        resolvers[0] = new HijackingDetectWrapper(
+                new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0])));
         resolvers[1] = new HijackingDetectWrapper(
                 new Resolver(InetAddress.getByName("114.114.115.115")));
 
