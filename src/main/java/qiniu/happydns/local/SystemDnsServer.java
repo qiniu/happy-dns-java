@@ -21,7 +21,7 @@ public final class SystemDnsServer {
         try {
             Class<?> dirContext =
                     Class.forName("javax.naming.directory.DirContext");
-            Hashtable env = new Hashtable();
+            Hashtable<String, String> env = new Hashtable<String, String>();
             env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
             Class<?> initialDirContext =
                     Class.forName("javax.naming.directory.InitialDirContext");
@@ -90,5 +90,7 @@ public final class SystemDnsServer {
             e.printStackTrace();
         }
         return null;
+    }
+    private SystemDnsServer() {
     }
 }

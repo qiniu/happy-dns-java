@@ -7,6 +7,19 @@ targetCompatibility = 1.6
 version = '1.0'
 [compileJava,compileTestJava,javadoc]*.options*.encoding = 'UTF-8'
 
+//[compileJava, compileTestJava]*.options.collect {options ->
+//    options.debug = true
+//    options.deprecation = true
+//    options.compilerArgs.add '-Xlint'
+//    options.compilerArgs.add '-Xlint:-unchecked'
+//    options.compilerArgs.add '-Xlint:-serial'
+//    options.compilerArgs.add '-Xlint:-rawtypes'
+//}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked"
+}
+
 repositories {
     mavenCentral()
 }

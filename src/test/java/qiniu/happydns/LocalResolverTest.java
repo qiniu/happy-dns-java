@@ -34,6 +34,7 @@ public class LocalResolverTest {
                 Assert.assertFalse(r.value, r.isExpired());
             }
         } catch (IOException e) {
+            e.printStackTrace();
             Assert.fail(e.getMessage());
         }
     }

@@ -17,8 +17,8 @@
 DnsClient 可以创建一次，一直使用。
 ```java
     IResolver[] resolvers = new IResolver[2];
-    resolvers[0] = AndroidDnsServer.defaultResolver();
-    resolvers[1] = new Resolver(InetAddress.getByName("114.114.115.115"));
+    resolvers[0] = new DnspodFree();
+    resolvers[1] = new Resolver(InetAddress.getByName("119.29.29.29"));
     DnsClient dns = new DnsManager(NetworkInfo.normal(), resolvers);
 ```
 
