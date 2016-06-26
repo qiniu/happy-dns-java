@@ -21,7 +21,7 @@ public class DnsTest {
     @Test
     public void testDns() throws IOException {
         IResolver[] resolvers = new IResolver[2];
-        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
+        resolvers[0] = SystemDnsServer.defaultResolver();
         resolvers[1] = new Resolver(InetAddress.getByName("119.29.29.29"));
         DnsClient dns = new DnsClient(resolvers);
         String[] ips = dns.query("www.qiniu.com");
@@ -33,7 +33,7 @@ public class DnsTest {
     public void testTtl() throws IOException {
         IResolver[] resolvers = new IResolver[2];
         resolvers[0] = new HijackingDetectWrapper(
-                new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0])));
+                new Resolver(InetAddress.getByName(SystemDnsServer.defaultServer()[0])));
         resolvers[1] = new HijackingDetectWrapper(
                 new Resolver(InetAddress.getByName("119.29.29.29")));
 
@@ -58,7 +58,7 @@ public class DnsTest {
     public void testCname() throws IOException {
         IResolver[] resolvers = new IResolver[2];
         resolvers[0] = new HijackingDetectWrapper(
-                new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0])));
+                new Resolver(InetAddress.getByName(SystemDnsServer.defaultServer()[0])));
         resolvers[1] = new HijackingDetectWrapper(
                 new Resolver(InetAddress.getByName("114.114.115.115")));
 
@@ -82,7 +82,7 @@ public class DnsTest {
 
     public void testNull() throws UnknownHostException {
         IResolver[] resolvers = new IResolver[1];
-        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
+        resolvers[0] = SystemDnsServer.defaultResolver();
         DnsClient dns = new DnsClient(resolvers);
         IOException e = null;
         try {
@@ -114,7 +114,7 @@ public class DnsTest {
 
     public void testIp() throws IOException {
         IResolver[] resolvers = new IResolver[1];
-        resolvers[0] = new Resolver(InetAddress.getByName(SystemDnsServer.getByUnixConf()[0]));
+        resolvers[0] = SystemDnsServer.defaultResolver();
         DnsClient dns = new DnsClient(resolvers);
         String[] ips = dns.query("1.1.1.1");
         Assert.assertEquals(ips.length, 1);

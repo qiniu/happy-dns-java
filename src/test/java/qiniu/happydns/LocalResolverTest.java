@@ -41,8 +41,7 @@ public class LocalResolverTest {
 
     @Test
     public void testLocal() throws UnknownHostException {
-        String[] r = SystemDnsServer.getByUnixConf();
-        template(r[0]);
+        template(SystemDnsServer.defaultResolver());
     }
 
     //    http://www.alidns.com/

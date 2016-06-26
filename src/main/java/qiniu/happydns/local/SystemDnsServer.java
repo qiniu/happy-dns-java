@@ -1,11 +1,13 @@
 package qiniu.happydns.local;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import qiniu.happydns.Domain;
+import qiniu.happydns.IResolver;
+import qiniu.happydns.Record;
+
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -16,6 +18,11 @@ import java.util.List;
 
 // this is invalid on android
 public final class SystemDnsServer {
+    private static final boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("windows");
+    private static final String confName = "/etc/resolv.conf";
+    private static long lastMondifyTime = 0;
+    private static String[] curAddresses = null;
+
     private SystemDnsServer() {
     }
 
@@ -70,7 +77,7 @@ public final class SystemDnsServer {
     public static String[] getByUnixConf() {
         ArrayList<String> lines = new ArrayList<String>();
         try {
-            FileReader r = new FileReader("/etc/resolv.conf");
+            FileReader r = new FileReader(confName);
             BufferedReader input = new BufferedReader(r);
             String currentLine = null;
             while ((currentLine = input.readLine()) != null) {
@@ -93,5 +100,39 @@ public final class SystemDnsServer {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String[] defaultServer() {
+        String[] addresses = null;
+        File f = new File(confName);
+
+        if (!isWindows && f.exists()) {
+            if (f.lastModified() != lastMondifyTime) {
+                curAddresses = getByUnixConf();
+            }
+            addresses = curAddresses;
+        }
+        if (addresses == null) {
+            addresses = getByInternalAPI();
+            if (addresses == null) {
+                addresses = getByJNDI();
+            }
+        }
+        return addresses;
+    }
+
+    //system ip would change
+    public static IResolver defaultResolver() {
+        return new IResolver() {
+            @Override
+            public Record[] resolve(Domain domain) throws IOException {
+                String[] addresses = defaultServer();
+                if (addresses == null) {
+                    throw new IOException("no dns server");
+                }
+                IResolver resolver = new Resolver(InetAddress.getByName(addresses[0]));
+                return resolver.resolve(domain);
+            }
+        };
     }
 }
