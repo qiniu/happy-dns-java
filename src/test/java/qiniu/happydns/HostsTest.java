@@ -18,9 +18,8 @@ public class HostsTest {
         hosts.put("qiniu.com", "3.3.3.3");
         String[] r = hosts.query("hello.qiniu.com");
         Assert.assertEquals(2, r.length);
-        Assert.assertTrue(r[0].equals("1.1.1.1") || r[0].equals("2.2.2.2"));
-        Assert.assertTrue(r[1].equals("1.1.1.1") || r[1].equals("2.2.2.2"));
-        Assert.assertTrue(!r[0].equals(r[1]));
+        Assert.assertTrue(r[0].equals("2.2.2.2"));
+        Assert.assertTrue(r[1].equals("1.1.1.1"));
     }
 
     @Test

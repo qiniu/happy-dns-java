@@ -18,6 +18,11 @@ public final class Hosts implements IHosts {
         if (values == null || values.isEmpty()) {
             return null;
         }
+        if (values.size() > 1) {
+            String first = values.get(0);
+            values.remove(0);
+            values.add(first);
+        }
         String[] r = new String[values.size()];
         return values.toArray(r);
     }

@@ -55,6 +55,7 @@ public class DnsTest {
         Assert.assertTrue(!"3.3.3.3".equals(r[0]));
     }
 
+    @Test
     public void testCname() throws IOException {
         IResolver[] resolvers = new IResolver[2];
         resolvers[0] = new HijackingDetectWrapper(
@@ -80,6 +81,7 @@ public class DnsTest {
         Assert.assertTrue(!"3.3.3.3".equals(r[0]));
     }
 
+    @Test
     public void testNull() throws UnknownHostException {
         IResolver[] resolvers = new IResolver[1];
         resolvers[0] = SystemDnsServer.defaultResolver();
@@ -112,6 +114,7 @@ public class DnsTest {
         Assert.assertNotNull(e);
     }
 
+    @Test
     public void testIp() throws IOException {
         IResolver[] resolvers = new IResolver[1];
         resolvers[0] = SystemDnsServer.defaultResolver();

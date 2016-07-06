@@ -3,13 +3,13 @@ package qiniu.happydns;
 import qiniu.happydns.http.DomainNotOwn;
 import qiniu.happydns.http.IHosts;
 import qiniu.happydns.local.Hosts;
+import qiniu.happydns.util.IP;
 import qiniu.happydns.util.LruCache;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -20,7 +20,6 @@ public final class DnsClient {
     private final IResolver[] resolvers;
     private final LruCache<String, Record[]> cache;
     private final IHosts hosts;
-    private final ShuffleIps sorter;
     private volatile int index = 0;
 
 
@@ -38,7 +37,6 @@ public final class DnsClient {
     public DnsClient(IResolver[] resolvers, IHosts hosts) {
         this.resolvers = resolvers.clone();
         cache = new LruCache<String, Record[]>(128);
-        sorter = new ShuffleIps();
         this.hosts = hosts;
     }
 
@@ -50,6 +48,14 @@ public final class DnsClient {
             }
         }
         return a.toArray(new Record[a.size()]);
+    }
+
+    private static void rotate(Record[] records) {
+        if (records != null && records.length > 1) {
+            Record first = records[0];
+            System.arraycopy(records, 1, records, 0, records.length - 1);
+            records[records.length - 1] = first;
+        }
     }
 
     private static String[] records2Ip(Record[] records) {
@@ -64,29 +70,6 @@ public final class DnsClient {
             return null;
         }
         return a.toArray(new String[a.size()]);
-    }
-
-    public static boolean validIP(String ip) {
-        if (ip == null || ip.length() < 7 || ip.length() > 15) return false;
-        if (ip.contains("-")) return false;
-
-        try {
-            int x = 0;
-            int y = ip.indexOf('.');
-
-            if (y != -1 && Integer.parseInt(ip.substring(x, y)) > 255) return false;
-
-            x = ip.indexOf('.', ++y);
-            if (x != -1 && Integer.parseInt(ip.substring(y, x)) > 255) return false;
-
-            y = ip.indexOf('.', ++x);
-            return !(y != -1 && Integer.parseInt(ip.substring(x, y)) > 255
-                    && Integer.parseInt(ip.substring(++y, ip.length() - 1)) > 255
-                    && ip.charAt(ip.length() - 1) != '.');
-
-        } catch (NumberFormatException e) {
-            return false;
-        }
     }
 
     /**
@@ -108,7 +91,7 @@ public final class DnsClient {
             throw new IOException("empty domain " + domain.domain);
         }
 
-        if (validIP(domain.domain)) {
+        if (IP.isValid(domain.domain)) {
             return new String[]{domain.domain};
         }
 
@@ -116,7 +99,7 @@ public final class DnsClient {
         if (r == null || r.length <= 1) {
             return r;
         }
-        return sorter.sort(r);
+        return r;
     }
 
     /**
@@ -145,6 +128,7 @@ public final class DnsClient {
                 records = cache.get(domain.domain);
                 if (records != null && records.length != 0) {
                     if (!records[0].isExpired()) {
+                        rotate(records);
                         return records2Ip(records);
                     } else {
                         records = null;
@@ -218,19 +202,13 @@ public final class DnsClient {
         }
     }
 
-    private static class ShuffleIps {
-        private AtomicInteger pos = new AtomicInteger();
-
-        String[] sort(String[] ips) {
-            if (ips == null || ips.length <= 1) {
-                return ips;
-            }
-            int x = pos.getAndIncrement() & 0XFF;
-            String[] ret = new String[ips.length];
-            for (int i = 0; i < ips.length; i++) {
-                ret[i] = ips[(i + x) % ips.length];
-            }
-            return ret;
+    /**
+     * 当网络发生变化时，进行通知
+     */
+    public void onNetworkChange() {
+        clearCache();
+        synchronized (resolvers) {
+            index = 0;
         }
     }
 }
