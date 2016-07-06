@@ -20,6 +20,11 @@ public class HostsTest {
         Assert.assertEquals(2, r.length);
         Assert.assertTrue(r[0].equals("2.2.2.2"));
         Assert.assertTrue(r[1].equals("1.1.1.1"));
+
+        String[] r2 = hosts.query("hello.qiniu.com");
+        Assert.assertEquals(2, r2.length);
+        Assert.assertTrue(r2[1].equals("2.2.2.2"));
+        Assert.assertTrue(r2[0].equals("1.1.1.1"));
     }
 
     @Test
