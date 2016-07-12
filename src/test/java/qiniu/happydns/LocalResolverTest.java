@@ -7,6 +7,7 @@ import qiniu.happydns.local.SystemDnsServer;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 /**
@@ -80,4 +81,14 @@ public class LocalResolverTest {
 //    public void testDnspai() throws UnknownHostException {
 //        template("101.226.4.6");
 //    }
+    @Test
+    public void testTimeout() throws UnknownHostException {
+        Resolver resolver = new Resolver(InetAddress.getByName("8.1.1.1"), 5);
+        try {
+            Record[] records = resolver.resolve(new Domain("baidu.com"));
+            Assert.fail("no timeout");
+        } catch (IOException e) {
+            Assert.assertTrue(e instanceof SocketTimeoutException);
+        }
+    }
 }
