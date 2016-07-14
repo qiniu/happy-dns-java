@@ -67,10 +67,10 @@ public class LocalResolverTest {
 //        template("1.2.4.8");
 //    }
 
-    @Test
-    public void testGoogle() throws UnknownHostException {
-        template("8.8.4.4");
-    }
+//    @Test
+//    public void testGoogle() throws UnknownHostException {
+//        template("8.8.4.4");
+//    }
 
     @Test
     public void testDnspod() throws UnknownHostException {

@@ -43,13 +43,16 @@ public final class Hosts implements IHosts {
     /**
      * avoid many server visit first ip in same time.s
      *
-     * @param domain
-     * @param ips
-     * @return
+     * @param domain 域名
+     * @param ips    IP 列表
+     * @return 当前host 实例
      */
     public Hosts putAllInRandomOrder(String domain, String[] ips) {
         Random random = new Random();
         int index = (int) (random.nextLong() % ips.length);
+        if (index < 0) {
+            index += ips.length;
+        }
         ArrayList<String> ipList = new ArrayList<String>();
         for (int i = 0; i < ips.length; i++) {
             ipList.add(ips[(i + index) % ips.length]);
