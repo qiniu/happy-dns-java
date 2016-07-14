@@ -4,6 +4,7 @@ import qiniu.happydns.http.IHosts;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Random;
 
 /**
  * Created by bailong on 15/6/18.
@@ -11,6 +12,7 @@ import java.util.Hashtable;
 public final class Hosts implements IHosts {
 
     private final Hashtable<String, ArrayList<String>> hosts = new Hashtable<String, ArrayList<String>>();
+    private final long keyIndex = System.currentTimeMillis();
 
     @Override
     public String[] query(String domain) {
@@ -35,6 +37,24 @@ public final class Hosts implements IHosts {
         }
         ips.add(ip);
         hosts.put(domain, ips);
+        return this;
+    }
+
+    /**
+     * avoid many server visit first ip in same time.s
+     *
+     * @param domain
+     * @param ips
+     * @return
+     */
+    public Hosts putAllInRandomOrder(String domain, String[] ips) {
+        Random random = new Random();
+        int index = (int) (random.nextLong() % ips.length);
+        ArrayList<String> ipList = new ArrayList<String>();
+        for (int i = 0; i < ips.length; i++) {
+            ipList.add(ips[(i + index) % ips.length]);
+        }
+        hosts.put(domain, ipList);
         return this;
     }
 }

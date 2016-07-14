@@ -39,4 +39,16 @@ public class HostsTest {
         Assert.assertEquals(1, r.length);
         Assert.assertEquals("4.4.4.4", r[0]);
     }
+
+    @Test
+    public void testRandomOrder() throws IOException {
+        Hosts hosts = new Hosts();
+        hosts.putAllInRandomOrder("qiniu.com",
+                new String[]{"1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4", "5.5.5.5"});
+        String[] r1 = hosts.query("qiniu.com");
+        hosts.putAllInRandomOrder("qiniu.com",
+                new String[]{"1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4", "5.5.5.5"});
+        String[] r2 = hosts.query("qiniu.com");
+        Assert.assertTrue(!(r1[0].equals(r2[0]) && r1[0].equals("1.1.1.1")));
+    }
 }

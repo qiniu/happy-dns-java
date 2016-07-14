@@ -17,9 +17,9 @@ import java.util.ArrayList;
  */
 public final class DnsClient {
 
+    public final IHosts hosts;
     private final IResolver[] resolvers;
     private final LruCache<String, Record[]> cache;
-    private final IHosts hosts;
     private volatile int index = 0;
 
 
