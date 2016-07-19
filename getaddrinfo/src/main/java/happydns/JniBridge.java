@@ -11,28 +11,33 @@ public final class JniBridge {
     private static JniBridge mInstance = new JniBridge();
     private IQuery callback;
 
-    public static JniBridge instance(){
+    public static JniBridge instance() {
         return mInstance;
     }
 
-    public String[]query(String host){
-        if (callback == null){
+    public String[] query(String host) {
+        if (callback == null) {
             return new String[]{host};
         }
         return mInstance.callback.query(host);
     }
 
-    public void setCallback(IQuery query){
+    public void setCallback(IQuery query) {
         this.callback = query;
     }
 
-    public void setDnsClient(DnsClient client){
+    public void setDnsClient(DnsClient client) {
         setCallback(new Query(client));
     }
 
-    private static class Query implements IQuery{
+    private native void setJniCallback();
+
+    native boolean test();
+
+    private static class Query implements IQuery {
         private final DnsClient dns;
-        public Query(DnsClient client){
+
+        public Query(DnsClient client) {
             dns = client;
         }
 
@@ -45,8 +50,4 @@ public final class JniBridge {
             }
         }
     }
-
-    private native void setJniCallback();
-
-    native boolean test();
 }
