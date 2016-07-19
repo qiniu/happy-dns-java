@@ -7,3 +7,7 @@ jdk:
   - openjdk6
   - oraclejdk7
   - oraclejdk8
+
+script:
+  ./gradlew build
+  cd getaddrinfo && ./gradlew build
