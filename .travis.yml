@@ -8,6 +8,4 @@ jdk:
   - oraclejdk7
   - oraclejdk8
 
-script:
-  ./gradlew build
-  cd getaddrinfo && ./gradlew build
+script: "./test.sh"
