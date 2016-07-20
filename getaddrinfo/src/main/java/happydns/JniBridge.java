@@ -28,11 +28,12 @@ public final class JniBridge {
 
     public void setDnsClient(DnsClient client) {
         setCallback(new Query(client));
+        setJniCallback();
     }
 
     private native void setJniCallback();
 
-    native boolean test();
+    native int test();
 
     private static class Query implements IQuery {
         private final DnsClient dns;

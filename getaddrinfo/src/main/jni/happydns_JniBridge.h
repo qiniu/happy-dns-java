@@ -12,16 +12,15 @@ extern "C" {
  * Method:    setJniCallback
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_happydns_JniBridge_setJniCallback
-  (JNIEnv *, jobject);
+JNIEXPORT void JNICALL Java_happydns_JniBridge_setJniCallback(JNIEnv *,
+                                                              jobject);
 
 /*
  * Class:     happydns_JniBridge
  * Method:    test
- * Signature: ()Z
+ * Signature: ()I
  */
-JNIEXPORT jboolean JNICALL Java_happydns_JniBridge_test
-  (JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_happydns_JniBridge_test(JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

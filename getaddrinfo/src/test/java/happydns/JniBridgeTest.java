@@ -3,6 +3,11 @@ package happydns;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import qiniu.happydns.DnsClient;
+import qiniu.happydns.IResolver;
+import qiniu.happydns.http.DnspodFree;
+import qiniu.happydns.local.Resolver;
+import qiniu.happydns.local.SystemDnsServer;
 
 /**
  * Created by bailong on 16/7/19.
@@ -25,8 +30,14 @@ public class JniBridgeTest {
     }
 
     @Test
-    public void notsetCallback() {
-        boolean x = JniBridge.instance().test();
-        Assert.assertTrue(x);
+    public void customDnsCallback() {
+        int x = JniBridge.instance().test();
+        Assert.assertEquals(0, x);
+        System.out.printf("not set result " + x);
+        DnsClient d = new DnsClient(new IResolver[]{SystemDnsServer.defaultResolver()});
+        JniBridge.instance().setDnsClient(d);
+        x = JniBridge.instance().test();
+        System.out.printf("custom result " + x);
+        Assert.assertEquals(0, x);
     }
 }

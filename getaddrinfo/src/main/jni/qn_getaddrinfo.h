@@ -11,15 +11,14 @@ extern "C" {
 
 #include <netdb.h>
 
-typedef struct qn_ips_ret {
-    char *ips[1];
-} qn_ips_ret;
+typedef struct qn_ips_ret { char *ips[1]; } qn_ips_ret;
 
 typedef qn_ips_ret *(*qn_dns_callback)(const char *host);
 
 extern void qn_free_ips_ret(qn_ips_ret *ip_list);
 
-extern int qn_getaddrinfo(const char *hostname, const char *servname, const struct addrinfo *hints, struct addrinfo **res);
+extern int qn_getaddrinfo(const char *hostname, const char *servname,
+                          const struct addrinfo *hints, struct addrinfo **res);
 
 extern void qn_freeaddrinfo(struct addrinfo *ai);
 
