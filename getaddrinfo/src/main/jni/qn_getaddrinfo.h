@@ -1,7 +1,3 @@
-//
-//  QNGetAddrInfo.h
-//  HappyDNS
-//
 //  Created by bailong on 16/7/19.
 //  Copyright © 2016年 Qiniu Cloud Storage. All rights reserved.
 //
@@ -12,6 +8,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <netdb.h>
 
 typedef struct qn_ips_ret {
     char *ips[1];

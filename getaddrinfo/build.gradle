@@ -1,5 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'cpp'
+apply plugin: 'c'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -41,10 +41,13 @@ model {
     components {
         bridge(NativeLibrarySpec) {
             sources {
-                cpp {
+                c {
                     source {
                         srcDir 'src/main/jni'
                         include "**/*.c"
+                    }
+                    exportedHeaders {
+                        srcDirs "src/main/jni"
                     }
                 }
             }
@@ -54,35 +57,36 @@ model {
             }
         }
     }
+
     toolChains {
         gcc(Gcc) {
             eachPlatform {
                 if (System.properties['os.name'].equals('Mac OS X')) {
-                    cppCompiler.withArguments { args ->
+                    cCompiler.withArguments { args ->
                         args << "-O2"
                         args << "-I" + SYS_INCLUDE_DIR
                         args << "-I" + SYS_LOCAL_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR + "/darwin"
-                        args << "-std=c++11"
+//                        args << "-std=c++11"
                     }
                     linker.withArguments { args ->
                         args << "-O2"
-                        args << "-lc++"
+//                        args << "-lc++"
                     }
                 } else {
                     path "/opt/rh/devtoolset-2/root/usr/bin/gcc"
-                    cppCompiler.withArguments { args ->
+                    cCompiler.withArguments { args ->
                         args << "-O2"
                         args << "-I" + SYS_INCLUDE_DIR
                         args << "-I" + SYS_LOCAL_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR + "/linux"
-                        args << "-std=c++11"
+//                        args << "-std=c++11"
                     }
                     linker.withArguments { args ->
                         args << "-O2"
-                        args << "-lstdc++"
+//                        args << "-lstdc++"
                     }
                 }
             }
@@ -90,30 +94,30 @@ model {
         clang(Clang) {
             eachPlatform {
                 if (System.properties['os.name'].equals('Mac OS X')) {
-                    cppCompiler.withArguments { args ->
+                    cCompiler.withArguments { args ->
                         args << "-O2"
                         args << "-I" + SYS_INCLUDE_DIR
                         args << "-I" + SYS_LOCAL_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR + "/darwin"
-                        args << "-std=c++11"
+//                        args << "-std=c++11"
                     }
                     linker.withArguments { args ->
                         args << "-O2"
-                        args << "-lc++"
+//                        args << "-lc++"
                     }
                 } else {
-                    cppCompiler.withArguments { args ->
+                    cCompiler.withArguments { args ->
                         args << "-O2"
                         args << "-I" + SYS_INCLUDE_DIR
                         args << "-I" + SYS_LOCAL_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR
                         args << "-I" + JNI_INCLUDE_DIR + "/linux"
-                        args << "-std=c++11"
+//                        args << "-std=c++11"
                     }
                     linker.withArguments { args ->
                         args << "-O2"
-                        args << "-lstdc++"
+//                        args << "-lstdc++"
                     }
                 }
             }

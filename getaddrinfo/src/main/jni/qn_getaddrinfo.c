@@ -1,14 +1,10 @@
-//
-//  QNGetAddrInfo.c
-//  HappyDNS
-//
 //  Created by bailong on 16/7/19.
 //  Copyright © 2016年 Qiniu Cloud Storage. All rights reserved.
 //
 
-#include "string.h"
-#include "netdb.h"
-#include "stdlib.h"
+#include <string.h>
+#include <netdb.h>
+#include <stdlib.h>
 
 #include "qn_getaddrinfo.h"
 
