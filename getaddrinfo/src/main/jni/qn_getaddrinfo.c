@@ -29,10 +29,10 @@ static int isIp(const char* domain) {
 
 static struct addrinfo* addrinfo_clone(struct addrinfo* addr) {
     struct addrinfo* ai;
-    ai = calloc(sizeof(struct addrinfo) + addr->ai_addrlen, 1);
+    ai = (struct addrinfo*)calloc(sizeof(struct addrinfo) + addr->ai_addrlen, 1);
     if (ai) {
         memcpy(ai, addr, sizeof(struct addrinfo));
-        ai->ai_addr = (void*)(ai + 1);
+        ai->ai_addr = (struct sockaddr *)(ai + 1);
         memcpy(ai->ai_addr, addr->ai_addr, addr->ai_addrlen);
         if (addr->ai_canonname) {
             ai->ai_canonname = strdup(addr->ai_canonname);

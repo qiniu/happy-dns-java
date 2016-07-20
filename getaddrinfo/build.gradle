@@ -44,7 +44,7 @@ model {
                 cpp {
                     source {
                         srcDir 'src/main/jni'
-                        include "**/*.cpp"
+                        include "**/*.c"
                     }
                 }
             }
@@ -142,7 +142,7 @@ task getHomeDir << {
 
 // apply plugin: 'checkstyle'
 
-def versionNameToCode(String version) {
+static def versionNameToCode(String version) {
     String v = version.replaceAll(/\./, '')
     return v.toLong()
 }
