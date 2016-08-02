@@ -149,6 +149,9 @@ public final class DnsClient {
             } catch (IOException e) {
                 lastE = e;
                 e.printStackTrace();
+            } catch (Exception e) {
+                lastE = new IOException(e);
+                e.printStackTrace();
             }
             String ip2 = Network.getIp();
             if ((records == null || records.length == 0) && ip.equals(ip2)) {
