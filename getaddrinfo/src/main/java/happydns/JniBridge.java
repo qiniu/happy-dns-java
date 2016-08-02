@@ -22,6 +22,9 @@ public final class JniBridge {
         return mInstance.callback.query(host);
     }
 
+    public void ipReport(String ip, int code, int ms) {
+    }
+
     public void setCallback(IQuery query) {
         this.callback = query;
     }

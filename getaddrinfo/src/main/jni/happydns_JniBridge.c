@@ -1,21 +1,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "happydns_JniBridge.h"
 #include "qn_getaddrinfo.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-static jmethodID dns_callback_method_id = NULL;
 static JavaVM* javaVM = NULL;
 static jobject g_jni_bridge = NULL;
 
-#ifdef __cplusplus
-}
-#endif
+static jmethodID dns_callback_method_id = NULL;
+static jmethodID ip_report_callback_method_id = NULL;
+
 
 static qn_ips_ret* jni_dns_callback(const char *host){
    if (g_jni_bridge == NULL) {
@@ -55,6 +49,21 @@ static qn_ips_ret* jni_dns_callback(const char *host){
     return ret;
 }
 
+static void jni_ip_report_callback(const char *ip, int code, int time_ms) {
+    if (g_jni_bridge == NULL) {
+        return;
+    }
+
+    JNIEnv *env = NULL;
+    (*javaVM)->AttachCurrentThread(javaVM, (void **)&env, NULL);
+    jstring ipStr = (*env)->NewStringUTF(env, ip);
+    (*env)->CallObjectMethod(env, g_jni_bridge, ip_report_callback_method_id, domain);
+
+     (*env)->DeleteLocalRef(env, ipStr);
+     (*javaVM)->DetachCurrentThread(javaVM);
+    return ret;
+}
+
 JNIEXPORT void JNICALL Java_happydns_JniBridge_setJniCallback
   (JNIEnv *env, jobject obj) {
     if(javaVM != NULL){
@@ -63,8 +72,12 @@ JNIEXPORT void JNICALL Java_happydns_JniBridge_setJniCallback
     (*env)->GetJavaVM(env, &javaVM);
     jclass cls = (*env)->GetObjectClass(env, obj);
     g_jni_bridge = (*env)->NewGlobalRef(env, obj);
+
     dns_callback_method_id = (*env)->GetMethodID(env, cls, "query", "(Ljava/lang/String;)[Ljava/lang/String;");
     qn_set_dns_callback(jni_dns_callback);
+
+    ip_report_callback_method_id = (*env)->GetMethodID(env, cls, "ipReport", "(Ljava/lang/String;II)V");
+    qn_set_ip_report_callback(jni_ip_report_callback);
 }
 
 static int count(struct addrinfo *ai) {
@@ -160,3 +173,40 @@ JNIEXPORT jint JNICALL Java_happydns_JniBridge_test
   return testCustomDns();
 }
 
+static qn_ips_ret* jni_dns_callback(const char *host){
+   if (g_jni_bridge == NULL) {
+        //only for compatible
+        qn_ips_ret *ret = (qn_ips_ret *)calloc(sizeof(char *), 2);
+        ret->ips[0] = strdup(host);
+        return ret;
+    }
+
+    JNIEnv *env = NULL;
+    (*javaVM)->AttachCurrentThread(javaVM, (void **)&env, NULL);
+    jstring domain = (*env)->NewStringUTF(env, host);
+    jobjectArray ips = NULL;
+    ips = (jobjectArray)(*env)->CallObjectMethod(env, g_jni_bridge, dns_callback_method_id, domain);
+    if( ips == NULL){
+        (*env)->DeleteLocalRef(env, domain);
+        (*javaVM)->DetachCurrentThread(javaVM);
+        return NULL;
+    }
+    jsize stringCount = (*env)->GetArrayLength(env, ips);
+    qn_ips_ret *ret = (qn_ips_ret *)calloc(sizeof(char *), stringCount + 1);
+    for (int i = 0; i < stringCount; i++) {
+       jstring string = (jstring) (*env)->GetObjectArrayElement(env, ips, i);
+       jboolean isCopy = JNI_FALSE;
+       const char* c = (*env)->GetStringUTFChars(env, string, &isCopy);
+       char* ip2 = strdup(c);
+       (*env)->DeleteLocalRef(env, string);
+       if(isCopy == JNI_TRUE){
+           (*env)->ReleaseStringUTFChars(env, string, c);
+       }
+       ret->ips[i] = ip2;
+    }
+
+     (*env)->DeleteLocalRef(env, domain);
+     (*env)->DeleteLocalRef(env, ips);
+     (*javaVM)->DetachCurrentThread(javaVM);
+    return ret;
+}

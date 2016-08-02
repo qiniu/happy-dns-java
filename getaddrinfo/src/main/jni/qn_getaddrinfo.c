@@ -118,3 +118,14 @@ void qn_freeaddrinfo(struct addrinfo* ai) {
 void qn_set_dns_callback(qn_dns_callback cb) {
     dns_callback = cb;
 }
+
+static qn_ip_report_callback ip_report_cb = NULL;
+void qn_set_ip_report_callback(qn_ip_report_callback cb){
+    ip_report_cb = cb;
+}
+
+void qn_ip_report(const struct addrinfo *info, int code, int time_ms){
+    if(ip_report_cb == NULL){
+        return;
+    }
+}
