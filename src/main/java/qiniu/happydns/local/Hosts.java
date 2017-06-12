@@ -2,7 +2,7 @@ package qiniu.happydns.local;
 
 import qiniu.happydns.http.IHosts;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Hashtable;
 import java.util.Random;
 
@@ -11,12 +11,11 @@ import java.util.Random;
  */
 public final class Hosts implements IHosts {
 
-    private final Hashtable<String, ArrayList<String>> hosts = new Hashtable<String, ArrayList<String>>();
-    private final long keyIndex = System.currentTimeMillis();
-
+    private final Hashtable<String, LinkedList<String>> hosts = new Hashtable<String, LinkedList<String>>();
+    
     @Override
-    public String[] query(String domain) {
-        ArrayList<String> values = hosts.get(domain);
+    public synchronized String[] query(String domain) {
+        LinkedList<String> values = hosts.get(domain);
         if (values == null || values.isEmpty()) {
             return null;
         }
@@ -30,10 +29,10 @@ public final class Hosts implements IHosts {
     }
 
     @Override
-    public Hosts put(String domain, String ip) {
-        ArrayList<String> ips = hosts.get(domain);
+    public synchronized Hosts put(String domain, String ip) {
+        LinkedList<String> ips = hosts.get(domain);
         if (ips == null) {
-            ips = new ArrayList<String>();
+            ips = new LinkedList<String>();
         }
         ips.add(ip);
         hosts.put(domain, ips);
@@ -47,13 +46,13 @@ public final class Hosts implements IHosts {
      * @param ips    IP 列表
      * @return 当前host 实例
      */
-    public Hosts putAllInRandomOrder(String domain, String[] ips) {
+    public synchronized Hosts putAllInRandomOrder(String domain, String[] ips) {
         Random random = new Random();
         int index = (int) (random.nextLong() % ips.length);
         if (index < 0) {
             index += ips.length;
         }
-        ArrayList<String> ipList = new ArrayList<String>();
+        LinkedList<String> ipList = new LinkedList<String>();
         for (int i = 0; i < ips.length; i++) {
             ipList.add(ips[(i + index) % ips.length]);
         }
