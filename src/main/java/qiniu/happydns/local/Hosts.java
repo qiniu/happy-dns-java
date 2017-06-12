@@ -15,7 +15,7 @@ public final class Hosts implements IHosts {
     private final long keyIndex = System.currentTimeMillis();
 
     @Override
-    public String[] query(String domain) {
+    public synchronized String[] query(String domain) {
         ArrayList<String> values = hosts.get(domain);
         if (values == null || values.isEmpty()) {
             return null;
@@ -30,7 +30,7 @@ public final class Hosts implements IHosts {
     }
 
     @Override
-    public Hosts put(String domain, String ip) {
+    public synchronized Hosts put(String domain, String ip) {
         ArrayList<String> ips = hosts.get(domain);
         if (ips == null) {
             ips = new ArrayList<String>();
@@ -47,7 +47,7 @@ public final class Hosts implements IHosts {
      * @param ips    IP 列表
      * @return 当前host 实例
      */
-    public Hosts putAllInRandomOrder(String domain, String[] ips) {
+    public synchronized Hosts putAllInRandomOrder(String domain, String[] ips) {
         Random random = new Random();
         int index = (int) (random.nextLong() % ips.length);
         if (index < 0) {
