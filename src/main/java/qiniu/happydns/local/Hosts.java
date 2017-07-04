@@ -12,7 +12,7 @@ import java.util.Random;
 public final class Hosts implements IHosts {
 
     private final Hashtable<String, LinkedList<String>> hosts = new Hashtable<String, LinkedList<String>>();
-    
+
     @Override
     public synchronized String[] query(String domain) {
         LinkedList<String> values = hosts.get(domain);
